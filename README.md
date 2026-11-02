@@ -1,6 +1,6 @@
 # React + TypeScript + Vite
 
-https://todo-frontend-nine-beta.vercel.app URL address Vercel
+https://todo-frontend-nine-beta.vercel.app URL address on Vercel
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
