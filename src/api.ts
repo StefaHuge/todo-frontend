@@ -56,3 +56,30 @@ export async function createTask(token: string, description: string,
     if (!response.ok) throw new Error('Ошибка создания задачи');
     return response.json();
 }
+
+export async function toggleTask(token: string, task: Task): Promise<Task> {
+    const response = await fetch(`${API_BASE_URL}/api/tasks/${task.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            description: task.description,
+            priority: task.priority,
+            isCompleted: !task.isCompleted, // ← переключаем статус
+        }),
+    });
+
+    if (!response.ok) throw new Error('Ошибка обновления задачи');
+    return response.json();
+}
+
+export async function deleteTask(token: string, taskId: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error('Ошибка удаления задачи');
+}

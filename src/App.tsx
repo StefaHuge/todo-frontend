@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {login, getTasks, createTask, type Task} from "./api";
+import {login, getTasks, createTask, toggleTask, deleteTask, type Task} from "./api";
 import * as React from "react";
 
 function App() {
@@ -37,6 +37,26 @@ function App() {
       const task = await createTask(token, newTask, 'MEDIUM');
       setTasks([...tasks, task]);
       setNewTask('');
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const handleToggle = async (task: Task) => {
+    if (!token) return;
+    try {
+      const updated = await toggleTask(token, task);
+      setTasks(tasks.map((t) => (t.id === updated.id ? updated : t)));
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const handleDelete = async (taskId: number) => {
+    if (!token) return;
+    try {
+      await deleteTask(token, taskId);
+      setTasks(tasks.filter((t) => t.id !== taskId));
     } catch (err: any) {
       setError(err.message);
     }
@@ -111,15 +131,33 @@ function App() {
                 <li key={task.id} className="bg-white p-4 rounded-lg shadow flex items-center gap-3">
                   <span className="text-gray-400 text-sm w-8">#{task.userTaskNumber}</span>
                   <span className={`flex-1 ${task.isCompleted ? 'line-through text-gray-400' : ''}`}>
-                {task.description}
-              </span>
+    {task.description}
+  </span>
                   <span className={`text-xs px-2 py-1 rounded ${
                       task.priority === 'HIGH' ? 'bg-red-100 text-red-700' :
                           task.priority === 'LOW' ? 'bg-green-100 text-green-700' :
                               'bg-yellow-100 text-yellow-700'
                   }`}>
-                {task.priority}
-              </span>
+    {task.priority}
+  </span>
+                  <button
+                      onClick={() => handleToggle(task)}
+                      className={`text-sm px-3 py-1 rounded ${
+                          task.isCompleted
+                              ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                      }`}
+                      title={task.isCompleted ? 'Вернуть в работу' : 'Отметить выполненной'}
+                  >
+                    {task.isCompleted ? '↩' : '✓'}
+                  </button>
+                  <button
+                      onClick={() => handleDelete(task.id)}
+                      className="text-sm px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200"
+                      title="Удалить задачу"
+                  >
+                    ✕
+                  </button>
                 </li>
             ))}
           </ul>
