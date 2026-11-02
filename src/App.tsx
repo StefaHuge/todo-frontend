@@ -1,6 +1,5 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, type SubmitEvent, useMemo} from "react";
 import {login, getTasks, createTask, toggleTask, deleteTask, type Task} from "./api";
-import * as React from "react";
 
 function App() {
   const [token, setToken] = useState<string | null>(localStorage
@@ -9,6 +8,10 @@ function App() {
   const [password, setPassword] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState('');
+  const [newPriority, setNewPriority] = useState<'HIGH' | 'MEDIUM' | 'LOW'>
+  ('MEDIUM');
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>(
+      'all');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -18,27 +21,48 @@ function App() {
     }
   }, [token]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleError = (err: unknown) => {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError('Произошла неизвестная ошибка');
+    }
+  };
+
+  const handleLogin = async (
+      e: SubmitEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     try {
       const newToken = await login(email, password);
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setError('');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      handleError(err);
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      if (filter === 'active') return !task.isCompleted;
+      if (filter === 'completed') return task.isCompleted;
+      return true;
+    });
+  }, [tasks, filter]);
+
+  const handleCreate = async (
+      e: SubmitEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     if (!newTask.trim() || !token) return;
     try {
-      const task = await createTask(token, newTask, 'MEDIUM');
+      const task = await createTask(token, newTask, newPriority);
       setTasks([...tasks, task]);
       setNewTask('');
-    } catch (err: any) {
-      setError(err.message);
+      setNewPriority('MEDIUM');
+    } catch (err: unknown) {
+      handleError(err);
     }
   };
 
@@ -47,8 +71,8 @@ function App() {
     try {
       const updated = await toggleTask(token, task);
       setTasks(tasks.map((t) => (t.id === updated.id ? updated : t)));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      handleError(err);
     }
   };
 
@@ -57,8 +81,8 @@ function App() {
     try {
       await deleteTask(token, taskId);
       setTasks(tasks.filter((t) => t.id !== taskId));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      handleError(err);
     }
   };
 
@@ -74,7 +98,7 @@ function App() {
         center p-4">
           <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl
           shadow-md w-full max-w-sm">
-            <h1 className="text-2x1 font-bold mb-6 text-center">ToDO App</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center">ToDO App</h1>
             {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
             <input
             type="email"
@@ -108,6 +132,37 @@ function App() {
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Мои задачи</h1>
+            <div className="flex gap-2 mb-4">
+              <button
+              onClick={() => setFilter('all')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                filter === 'all' ? 'bg-blue-600 text-white' : 
+                    'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+              >
+                Все ({tasks.length})
+              </button>
+              <button
+              onClick={() => setFilter('active')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                filter === 'active' ? 'bg-blue-600 text-white' : 
+                    'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+              >
+                Активные ({tasks.filter((t) => !t.isCompleted)
+                  .length})
+              </button>
+              <button
+                  onClick={() => setFilter('completed')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                    filter === 'completed' ? 'bg-blue-600 text-white' :
+                        'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+              >
+                Выполненные ({tasks.filter((t) => t
+                  .isCompleted).length})
+              </button>
+            </div>
             <button onClick={handleLogout} className="text-red-600 text-sm hover:underline">Выйти</button>
           </div>
 
@@ -118,16 +173,28 @@ function App() {
                 type="text"
                 placeholder="Новая задача..."
                 value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
+                onChange={(e
+                ) => setNewTask(e.target.value)}
                 className="flex-1 p-3 border rounded-lg"
             />
+            <select
+            value={newPriority}
+            onChange={
+              (e) =>
+                  setNewPriority(e.target.value as 'HIGH' | 'MEDIUM' | 'LOW' )}
+            className="p-3 border rounded-lg bg-white"
+            >
+              <option value="HIGH">🔴 Высокий</option>
+              <option value="MEDIUM">🟡 Средний</option>
+              <option value="LOW">🟢 Низкий</option>
+            </select>
             <button type="submit" className="bg-green-600 text-white px-6 rounded-lg font-semibold hover:bg-green-700">
               Добавить
             </button>
           </form>
 
           <ul className="space-y-2">
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
                 <li key={task.id} className="bg-white p-4 rounded-lg shadow flex items-center gap-3">
                   <span className="text-gray-400 text-sm w-8">#{task.userTaskNumber}</span>
                   <span className={`flex-1 ${task.isCompleted ? 'line-through text-gray-400' : ''}`}>
