@@ -338,7 +338,7 @@ function App() {
                       title={task.isCompleted ? 'Вернуть в работу' :
                           'Отметить выполненной'}
                   >
-                    {task.isCompleted ? '↩' : '✓'}
+                    {task.isCompleted ? '⏎' : '✓'}
                   </button>
                   <button
                       onClick={() => handleDelete(task.id)}
