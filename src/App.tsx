@@ -132,10 +132,6 @@ function App() {
             className="w-full p-3 border rounded-lg mb-4"
             required
             />
-            <button type="submit" className="w-full bg-blue-600 text-white
-            p-3 rounded-lg font-semibold hover:bg-blue-700">
-              Войти
-            </button>
             <button type="submit">
               {isRegisterMode ? 'Зарегистрироваться' : 'Войти'}
             </button>
