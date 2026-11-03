@@ -98,7 +98,8 @@ function App() {
     if (!token) return;
     try {
       await deleteTask(token, taskId);
-      setTasks(tasks.filter((t) => t.id !== taskId));
+      const updatedTasks = await getTasks(token);
+      setTasks(updatedTasks);
     } catch (err: unknown) {
       handleError(err);
     }
