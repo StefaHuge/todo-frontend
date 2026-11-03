@@ -279,7 +279,7 @@ function App() {
                         >
                           <option value="HIGH">🔴 Высокий</option>
                           <option value="MEDIUM">🟡 Средний</option>
-                          <option value="LOW">🟡 Средний</option>
+                          <option value="LOW">🟢 Низкий</option>
                         </select>
                         <button
                             onClick={handleEditSave}
