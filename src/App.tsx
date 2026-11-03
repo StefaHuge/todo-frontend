@@ -1,5 +1,5 @@
 import {useEffect, useState, type SubmitEvent, useMemo} from "react";
-import {login, getTasks, createTask, toggleTask, deleteTask, type Task, register} from "./api";
+import {login, getTasks, createTask, toggleTask, deleteTask, type Task, register, updateTask} from "./api";
 
 function App() {
   const [token, setToken] = useState<string | null>(localStorage
@@ -14,6 +14,10 @@ function App() {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>(
       'all');
   const [error, setError] = useState('');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editDescription, setEditDescription] = useState('');
+  const [editPriority, setEditPriority] = useState<'HIGH' | 'MEDIUM' |
+  'LOW'>('MEDIUM');
 
   useEffect(() => {
     if (token) {
@@ -106,11 +110,42 @@ function App() {
     setTasks([]);
   };
 
+  const handleEditStart = (task: Task) => {
+    setEditingTask(task);
+    setEditDescription(task.description);
+    setEditPriority(task.priority);
+  };
+
+  const handleEditCancel = () => {
+    setEditingTask(null);
+    setEditDescription('');
+  };
+
+  const handleEditSave = async () => {
+    if (!token || !editingTask || !editDescription.trim()) return;
+    try {
+      const updated = await updateTask(
+          token,
+          editingTask.id,
+          editDescription,
+          editPriority,
+          editingTask.isCompleted
+      );
+      setTasks(tasks.map((t) => (t.id === updated.id ?
+          updated : t)));
+      setEditingTask(null);
+      setEditDescription('');
+    } catch (err: unknown) {
+      handleError(err);
+    }
+  };
+
   if (!token) {
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-
-        center p-4">
-          <form onSubmit={isRegisterMode ? handleRegister : handleLogin} className="bg-white p-8 rounded-xl
+        <div className="min-h-screen bg-gray-100 flex items-center
+        justify-center p-4">
+          <form onSubmit={isRegisterMode ? handleRegister : handleLogin}
+                className="bg-white p-8 rounded-xl
           shadow-md w-full max-w-sm">
             <h1 className="text-2xl font-bold mb-6 text-center">ToDO App</h1>
             {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
@@ -188,7 +223,8 @@ function App() {
                   .isCompleted).length})
               </button>
             </div>
-            <button onClick={handleLogout} className="text-red-600 text-sm hover:underline">Выйти</button>
+            <button onClick={handleLogout} className="text-red-600
+            text-sm hover:underline">Выйти</button>
           </div>
 
           {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -213,43 +249,107 @@ function App() {
               <option value="MEDIUM">🟡 Средний</option>
               <option value="LOW">🟢 Низкий</option>
             </select>
-            <button type="submit" className="bg-green-600 text-white px-6 rounded-lg font-semibold hover:bg-green-700">
+            <button type="submit" className="bg-green-600 text-white
+            px-6 rounded-lg font-semibold hover:bg-green-700">
               Добавить
             </button>
           </form>
 
           <ul className="space-y-2">
             {filteredTasks.map((task) => (
-                <li key={task.id} className="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                  <span className="text-gray-400 text-sm w-8">#{task.userTaskNumber}</span>
-                  <span className={`flex-1 ${task.isCompleted ? 'line-through text-gray-400' : ''}`}>
+                <li key={task.id} className="bg-white p-4 rounded-lg
+                shadow flex items-center gap-3">
+                  {editingTask?.id === task.id ? (
+                      <>
+                        <input
+                            type="text"
+                            value={editDescription}
+                            onChange={
+                          (e) =>
+                                setEditDescription(e.target.value)}
+                            className="flex-1 p-2 border rounded-lg"
+                        />
+                        <select
+                            value={editPriority}
+                            onChange={
+                          (e) =>
+                              setEditPriority(e.target.value as 'HIGH' |
+                              'MEDIUM' | 'LOW')}
+                            className="p-2 border rounded-lg bg-white"
+                        >
+                          <option value="HIGH">🔴 Высокий</option>
+                          <option value="MEDIUM">🟡 Средний</option>
+                          <option value="LOW">🟡 Средний</option>
+                        </select>
+                        <button
+                            onClick={handleEditSave}
+                            className="text-sm px-3 py-1 rounded
+                            bg-green-600 text-white
+                            hover:bg-green-700"
+                            title="Сохранить"
+                        >
+                          ✓
+                        </button>
+                        <button
+                            onClick={handleEditCancel}
+                            className="text-sm px-3 py-1 rounded
+                            bg-gray-300 text-gray-700
+                            hover:bg-gray-400"
+                            title="Отменить"
+                        >
+                          ✕
+                        </button>
+                        </>
+                      ) : (
+                          <>
+                  <span className="text-gray-400 text-sm w-8">#{task
+                      .userTaskNumber}</span>
+                  <span className={`flex-1 ${task.isCompleted ? 
+                      'line-through text-gray-400' : ''}`}>
     {task.description}
   </span>
                   <span className={`text-xs px-2 py-1 rounded ${
-                      task.priority === 'HIGH' ? 'bg-red-100 text-red-700' :
-                          task.priority === 'LOW' ? 'bg-green-100 text-green-700' :
+                      task.priority === 'HIGH' ? 'bg-red-100 ' +
+                          'text-red-700' :
+                          task.priority === 'LOW' ? 'bg-green-100 ' +
+                              'text-green-700' :
                               'bg-yellow-100 text-yellow-700'
                   }`}>
     {task.priority}
   </span>
+
+                  <button
+                  onClick={() => handleEditStart(task)}
+                  className="text-sm px-3 py-1 rounded bg-blue-100
+                  text-blue-700 hover:bg-blue-200"
+                  title="Редактировать"
+                  >
+                    ✎
+                  </button>
                   <button
                       onClick={() => handleToggle(task)}
                       className={`text-sm px-3 py-1 rounded ${
                           task.isCompleted
-                              ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                              ? 'bg-gray-200 text-gray-600 ' +
+                              'hover:bg-gray-300'
+                              : 'bg-green-100 text-green-700 ' +
+                              'hover:bg-green-200'
                       }`}
-                      title={task.isCompleted ? 'Вернуть в работу' : 'Отметить выполненной'}
+                      title={task.isCompleted ? 'Вернуть в работу' :
+                          'Отметить выполненной'}
                   >
                     {task.isCompleted ? '↩' : '✓'}
                   </button>
                   <button
                       onClick={() => handleDelete(task.id)}
-                      className="text-sm px-3 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200"
+                      className="text-sm px-3 py-1 rounded bg-red-100
+                      text-red-700 hover:bg-red-200"
                       title="Удалить задачу"
                   >
                     ✕
                   </button>
+                  </>
+                  )}
                 </li>
             ))}
           </ul>

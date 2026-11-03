@@ -84,7 +84,32 @@ export async function toggleTask(token: string, task: Task): Promise<Task> {
         body: JSON.stringify({
             description: task.description,
             priority: task.priority,
-            isCompleted: !task.isCompleted, // ← переключаем статус
+            isCompleted: !task.isCompleted,
+        }),
+    });
+
+    if (!response.ok) throw new Error('Ошибка обновления задачи');
+    return response.json();
+}
+
+export async function updateTask(
+    token: string,
+    taskId: number,
+    description: string,
+    priority: 'HIGH' | 'MEDIUM' | 'LOW',
+    isCompleted: boolean
+): Promise<Task> {
+    const response = await fetch(`${API_BASE_URL}/api/tasks/${
+        taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            description,
+            priority,
+            isCompleted,
         }),
     });
 
