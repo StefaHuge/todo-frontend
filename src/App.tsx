@@ -1,9 +1,10 @@
 import {useEffect, useState, type SubmitEvent, useMemo} from "react";
-import {login, getTasks, createTask, toggleTask, deleteTask, type Task} from "./api";
+import {login, getTasks, createTask, toggleTask, deleteTask, type Task, register} from "./api";
 
 function App() {
   const [token, setToken] = useState<string | null>(localStorage
       .getItem('token'));
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -26,6 +27,19 @@ function App() {
       setError(err.message);
     } else {
       setError('Произошла неизвестная ошибка');
+    }
+  };
+
+  const handleRegister = async (
+      e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const newToken = await register(email, password);
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+      setError('');
+    } catch (err: unknown) {
+      handleError(err);
     }
   };
 
@@ -96,7 +110,7 @@ function App() {
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-
         center p-4">
-          <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl
+          <form onSubmit={isRegisterMode ? handleRegister : handleLogin} className="bg-white p-8 rounded-xl
           shadow-md w-full max-w-sm">
             <h1 className="text-2xl font-bold mb-6 text-center">ToDO App</h1>
             {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
@@ -121,6 +135,17 @@ function App() {
             <button type="submit" className="w-full bg-blue-600 text-white
             p-3 rounded-lg font-semibold hover:bg-blue-700">
               Войти
+            </button>
+            <button type="submit">
+              {isRegisterMode ? 'Зарегистрироваться' : 'Войти'}
+            </button>
+            <button
+            type="button"
+            onClick={() => setIsRegisterMode(!isRegisterMode)}
+            className="w-full mt-3 text-blue-600 text-sm hover:underline"
+            >
+              {isRegisterMode ? 'Уже есть аккаунт? Войти' :
+                  'Нет аккаунта? Зарегистрироваться'}
             </button>
           </form>
         </div>

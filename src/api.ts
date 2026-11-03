@@ -15,6 +15,23 @@ export interface AuthResponse {
     token: string;
 }
 
+export async function register(email: string, password: string): Promise<
+string> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({email, password}),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Ошибка регистрации');
+    }
+
+    const data: AuthResponse = await response.json();
+    return data.token;
+}
+
 export async function login(email: string, password: string): Promise<string> {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
