@@ -260,8 +260,8 @@ function App() {
 
           <ul className="space-y-2">
             {filteredTasks.map((task) => (
-                <li key={task.id} className="bg-white p-4 rounded-lg
-                shadow flex items-center gap-3">
+                <li key={task.id} className="bg-white p-3 sm:p-4 rounded-lg
+                shadow flex flex-wrap items-center gap-2 sm:gap-3">
                   {editingTask?.id === task.id ? (
                       <>
                         <input
@@ -270,47 +270,48 @@ function App() {
                             onChange={
                           (e) =>
                                 setEditDescription(e.target.value)}
-                            className="flex-1 p-2 border rounded-lg"
+                            className="w-full p-2 border rounded-lg mb-2"
                         />
+                        <div className="flex gap-2 w-full">
                         <select
                             value={editPriority}
-                            onChange={
-                          (e) =>
+                            onChange={(e) =>
                               setEditPriority(e.target.value as 'HIGH' |
                               'MEDIUM' | 'LOW')}
-                            className="p-2 border rounded-lg bg-white"
+                            className="flex-1 p-2 border rounded-lg bg-white w-full sm:w-auto"
                         >
                           <option value="HIGH">🔴 Высокий</option>
                           <option value="MEDIUM">🟡 Средний</option>
                           <option value="LOW">🟢 Низкий</option>
                         </select>
+
                         <button
                             onClick={handleEditSave}
-                            className="text-sm px-3 py-1 rounded
+                            className="px-3 py-2 rounded
                             bg-green-600 text-white
                             hover:bg-green-700"
-                            title="Сохранить"
                         >
                           ✓
                         </button>
                         <button
                             onClick={handleEditCancel}
-                            className="text-sm px-3 py-1 rounded
+                            className="px-3 py-2 rounded
                             bg-gray-300 text-gray-700
                             hover:bg-gray-400"
-                            title="Отменить"
                         >
                           ✕
                         </button>
+                          </div>
                         </>
                       ) : (
                           <>
-                  <span className="text-gray-400 text-sm w-8">#{task
+                  <span className="text-gray-400 text-sm w-8 shrink-0">#{task
                       .userTaskNumber}</span>
-                  <span className={`flex-1 ${task.isCompleted ? 
+                  <span className={`flex-1 min-w-[150px] ${task.isCompleted ? 
                       'line-through text-gray-400' : ''}`}>
     {task.description}
   </span>
+                  <div className="flex items-center gap-2 ml-auto">
                   <span className={`text-xs px-2 py-1 rounded ${
                       task.priority === 'HIGH' ? 'bg-red-100 ' +
                           'text-red-700' :
@@ -323,34 +324,28 @@ function App() {
 
                   <button
                   onClick={() => handleEditStart(task)}
-                  className="text-sm px-3 py-1 rounded bg-blue-100
+                  className="text-sm px-2 py-1 rounded bg-blue-100
                   text-blue-700 hover:bg-blue-200"
-                  title="Редактировать"
                   >
                     ✎
                   </button>
                   <button
                       onClick={() => handleToggle(task)}
-                      className={`text-sm px-3 py-1 rounded ${
+                      className={`text-sm px-2 py-1 rounded ${
                           task.isCompleted
-                              ? 'bg-gray-200 text-gray-600 ' +
-                              'hover:bg-gray-300'
-                              : 'bg-green-100 text-green-700 ' +
-                              'hover:bg-green-200'
-                      }`}
-                      title={task.isCompleted ? 'Вернуть в работу' :
-                          'Отметить выполненной'}
-                  >
+                              ? 'bg-gray-200 text-gray-600 ' 
+                              : 'bg-green-100 text-green-700 '
+                      }`}>
                     {task.isCompleted ? '↺' : '✓'}
                   </button>
                   <button
                       onClick={() => handleDelete(task.id)}
-                      className="text-sm px-3 py-1 rounded bg-red-100
+                      className="text-sm px-2 py-1 rounded bg-red-100
                       text-red-700 hover:bg-red-200"
-                      title="Удалить задачу"
                   >
                     ✕
                   </button>
+                  </div>
                   </>
                   )}
                 </li>
