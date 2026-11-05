@@ -9,7 +9,12 @@ export default defineConfig({
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        devOptions: {
+          enabled: true,
+          type: 'module',
+        },
         manifest: {
+          id: '/',
           name: 'ToDo App',
           short_name: 'ToDo',
           description: 'Мой планировщик задач',
@@ -22,11 +27,39 @@ export default defineConfig({
               src: 'pwa-192x192.png',
               sizes: '192x192',
               type: 'image/png',
+              purpose: 'any',
             },
             {
               src: 'pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png',
+              purpose: 'any',
+            },
+            {
+              src: 'pwa-maskable-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'maskable',
+            },
+            {
+              src: 'pwa-maskable-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable',
+            },
+          ],
+          screenshots: [
+            {
+              src: 'screenshot-wide.png',
+              sizes: '1365x768',
+              type: 'image/png',
+              form_factor: 'wide',
+            },
+            {
+              src: 'screenshot-mobile.png',
+              sizes: '1179x2096',
+              type: 'image/png',
+              form_factor: 'narrow',
             },
           ],
         },
