@@ -191,9 +191,10 @@ function App() {
   return (
       <div className="min-h-screen bg-gray-100 p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between
+          items-start sm:items-center gap-4 mb-6">
             <h1 className="text-2xl font-bold">Мои задачи</h1>
-            <div className="flex gap-2 mb-4">
+            <div className="flex flex-wrap gap-2">
               <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
@@ -225,12 +226,13 @@ function App() {
               </button>
             </div>
             <button onClick={handleLogout} className="text-red-600
-            text-sm hover:underline">Выйти</button>
+            text-sm hover:underline self-end sm:self-auto">Выйти</button>
           </div>
 
           {error && <p className="text-red-500 mb-4">{error}</p>}
 
-          <form onSubmit={handleCreate} className="flex gap-2 mb-6">
+          <form onSubmit={handleCreate} className="flex flex-col sm:flex-row
+          gap-2 mb-6">
             <input
                 type="text"
                 placeholder="Новая задача..."
@@ -244,14 +246,14 @@ function App() {
             onChange={
               (e) =>
                   setNewPriority(e.target.value as 'HIGH' | 'MEDIUM' | 'LOW' )}
-            className="p-3 border rounded-lg bg-white"
+            className="p-3 border rounded-lg bg-white sm:w-auto"
             >
               <option value="HIGH">🔴 Высокий</option>
               <option value="MEDIUM">🟡 Средний</option>
               <option value="LOW">🟢 Низкий</option>
             </select>
             <button type="submit" className="bg-green-600 text-white
-            px-6 rounded-lg font-semibold hover:bg-green-700">
+            px-6 py-3 rounded-lg font-semibold hover:bg-green-700">
               Добавить
             </button>
           </form>
