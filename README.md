@@ -1,68 +1,7 @@
-# ToDo App — Frontend
+# ⚠️ Репозиторий перенесён
 
-Клиентская часть приложения для управления задачами. React + TypeScript + Vite + TailwindCSS.
+Этот репозиторий больше не поддерживается. Актуальная версия проекта (Fullstack: Spring Boot + React + Docker) находится здесь:
 
-**[🔗 Живое демо](https://todo-frontend-nine-beta.vercel.app)** 
-**[🔗 Бэкенд (Spring Boot)](https://github.com/StefaHuge/todo-spring-boot)**
+**👉 [todo-fullstack](https://github.com/StefaHuge/todo-fullstack)**
 
-## 🛠 Технологии
-
-- **React 19** + **TypeScript**
-- **Vite** (сборка)
-- **TailwindCSS** (стилизация)
-- **PWA** (устанавливается на телефон)
-- **ESLint** + **Prettier** (качество кода)
-
-## ✨ Возможности
-
-- Регистрация и вход (JWT)
-- Просмотр списка задач с фильтрацией (все / активные / выполненные)
-- Создание задачи с выбором приоритета
-- Редактирование описания и приоритета
-- Отметка «выполнено» и удаление
-- Адаптивный дизайн для мобильных устройств
-- Установка как PWA (на iPhone / Android)
-
-## 🚀 Как запустить локально
-
-1. Установите зависимости:
-   ```bash
-   npm install
-   ```
-
-2. Создайте файл .env в корне и укажите URL бэкенда:
-```text
-VITE_API_URL=http://localhost:8081
-```
-
-3. Запустите dev-сервер:
-```bash
-npm run dev
-```
-
-4. Откройте http://localhost:5173
-
-
-📦 Сборка для продакшена
-
-```bash
-npm run build
-```
-Готовые файлы появятся в папке dist/.
-
-🌐 Деплой
-
-Фронтенд задеплоен на Vercel. При каждом пуше в main происходит автоматическая сборка и деплой.
-
-📁 Структура проекта
-```text
-src/
-├── api.ts          # клиент для работы с API
-├── App.tsx         # главный компонент
-├── main.tsx        # точка входа
-└── index.css       # стили (Tailwind)
-```
-
-📄 Лицензия
-MIT   
-
+Живое демо: [https://todo-frontend-nine-beta.vercel.app](https://todo-frontend-nine-beta.vercel.app)
